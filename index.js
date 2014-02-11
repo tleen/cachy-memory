@@ -3,7 +3,7 @@
 var pkg = require('./package.json'),
 _ = require('underscore');
 
-module.exports = (function(){
+module.exports = function(){
   
   var storage = {};
 
@@ -28,11 +28,12 @@ module.exports = (function(){
 
   var remove = function(key, callback){
     delete storage[key];
-    return callback();
+    return callback(null);
   };
 
   var keys = function(callback){
-    return callback(null, _.keys(storage));
+    var keys = _.keys(storage);
+    return callback(null, keys);
   };
 
   var size = function(callback){
@@ -50,4 +51,4 @@ module.exports = (function(){
     version : pkg.version
   };
 
-})();
+};

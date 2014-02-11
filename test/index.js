@@ -4,10 +4,8 @@ var pkg = require('../package.json'),
 should = require('should'),
 _ = require('underscore');
 
-
-
 describe('versioning', function(){
-  var cache = require('..');
+  var cache = require('..')();
 
   console.log(cache);
 
@@ -21,7 +19,7 @@ describe('versioning', function(){
 });
 
 describe('cachy storage interface exists', function(){
-  var cache = require('..');
+  var cache = require('..')();
 
   var fxns = ['write', 'has', 'read', 'remove', 'clear', 'keys', 'size'];
   describe('interface has', function(){
@@ -36,7 +34,7 @@ describe('cachy storage interface exists', function(){
 
 describe('operations', function(done){
 
-  var cache = require('..');
+  var cache = require('..')();
   var samples = [
     {key : 'some-string', data : 'This is a plain string'}, 
     {key : 'some-number', data : 12345678},
