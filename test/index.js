@@ -1,13 +1,14 @@
 'use strict';
 
-var pkg = require('../package.json'),
+var async = require('async'),
+pkg = require('../package.json'),
 should = require('should'),
 _ = require('underscore');
 
 describe('versioning', function(){
   var cache = require('..')();
 
-  console.log(cache);
+//  console.log(cache);
 
   it('should have a version', function(){
     cache.should.have.property('version');
@@ -32,13 +33,14 @@ describe('cachy storage interface exists', function(){
 });
 
 
-describe('operations', function(done){
+var samples = [
+  {key : 'some-string', data : 'This is a plain string'}, 
+  {key : 'some-number', data : 12345678},
+  {key : 'an-object', data : {first : 'first item', second : 12345}}];
+
+describe('cachy interface', function(done){
 
   var cache = require('..')();
-  var samples = [
-    {key : 'some-string', data : 'This is a plain string'}, 
-    {key : 'some-number', data : 12345678},
-    {key : 'an-object', data : {first : 'first item', second : 12345}}];
 
   var keys = _.pluck(samples, 'key');
 
@@ -140,6 +142,70 @@ describe('operations', function(done){
       });
     });
   });
+});
+
+describe('extensions', function(){
+
+  var cache = require('..')();
+  var storageObj = null;
+
+// load cache
+  before(function(done){
+    async.each(
+      samples, 
+      function(item, callback){ cache.write(item.key, item.data, callback); }, 
+      done);
+  });
+
+  describe('get()', function(){
+    console.log('get');
+    it('the storage object exists', function(){
+      storageObj = cache.get();
+      should(storageObj).be.ok.and.a.Object;
+    });
+    
+    it('should be the same size', function(done){
+      _.size(storageObj).should.equal(samples.length);
+      cache.size(function(size){
+	_.size(storageObj).should.equal(size);
+	return done();
+      });
+    });        
+  });
+
+
+  describe('load()', function(){
+    it('clearing cache', function(done){
+      cache.clear(function(){
+	cache.size(function(size){ 
+	  size.should.equal(0);
+	  return done();
+	});
+      });
+    });
+
+    it('should load cache', function(){
+      cache.load(storageObj);
+      it('should have restored size', function(done){
+	cache.size(function(size){
+	  _.size(storageObj).should.equal(size);
+	});
+      });
+    });
+
+    describe('data re-loaded', function(){
+      _.each(samples, function(item){
+	it('should read "' + item.key + '"', function(done){ 
+	  cache.read(item.key, function(err, data){
+	    if(err) return done(err);
+	    data.should.eql(item.data);
+	    return done();
+	  });
+	});
+      });
+    });
+  });
+
 });
 
 

@@ -40,6 +40,14 @@ module.exports = function(){
     return callback(_.size(storage));
   };
 
+  var load = function(obj){
+    storage = obj;
+  };
+
+  var get = function(){
+    return storage;
+  };
+
   return {
     write : write,
     has : has,
@@ -48,7 +56,11 @@ module.exports = function(){
     clear : clear,
     keys : keys,
     size : size,
-    version : pkg.version
+    version : pkg.version,
+
+    // support methods for wrapper modules
+    load : load, // load a storage object
+    get : get // get the current storage object
   };
 
 };
